@@ -29,6 +29,12 @@ void plot()
     }
     cout << ": succeeded!" << endl;
 
+    // colors:
+    // 55 - 'rainbow' palette (discouraged)
+    // 53 - dark body radiator
+    // 56 - inverted dark body radiator
+    gStyle->SetPalette(55);
+
     // the histogram
     //200mm scan direction, 60mm head / wedge width
     TH2D *histo = new TH2D("Ultrasonic A-C-S Scan","Ultrasonic A-C-S Scan",1000,0,200,60,0,60);
@@ -39,6 +45,16 @@ void plot()
     TH2D *histo_n = new TH2D("Ultrasonic A-C-S Scan Normalised","Ultrasonic A-C-S Scan Normalised",1000,0,200,60,0,60);
     histo_n->SetXTitle("Scan Position [mm]");
     histo_n->SetYTitle("Index Position [mm]");
+
+    // differential in scan direction
+    TH2D *histo_dx = new TH2D("Ultrasonic A-C-S Scan Differential X","#partialA / #partialX",1000,0,200,60,0,60);
+    histo_dx->SetXTitle("Scan Position [mm]");
+    histo_dx->SetYTitle("Index Position [mm]");
+
+    // differential in index direction
+    TH2D *histo_di = new TH2D("Ultrasonic A-C-S Scan Differential I","#partialA / #partialI",1000,0,200,60,0,60);
+    histo_di->SetXTitle("Scan Position [mm]");
+    histo_di->SetYTitle("Index Position [mm]");
 
     // the output file we want to save into
     TFile * outputFile = new TFile("output.root", "RECREATE");
@@ -54,6 +70,9 @@ void plot()
 
     // first scan position in x in mm
     double startx = 0.0;
+
+    // position in mm of each index
+    double indexlist[100] = {0.0};
 
     // read file
     while( filestream.good() && ! filestream.eof() )
@@ -121,6 +140,7 @@ void plot()
 	    listentry >> startx;
 	}
 
+	// now the data
 	if (linecount > 23)
 	{
 
@@ -134,14 +154,34 @@ void plot()
 	    double indexpos = 0.0;
 	    listentry >> indexpos;
 
+	    // save this for later
+	    indexlist[linecount] = indexpos;
+
 	    // temp to read into
 	    double temp = 0.0;
+
+	    // value at previous scan position
+	    double prevtemp = 0.0;
+
+	    // as long as there is data
 	    while (listentry >> temp)
 	    {
+		// save into vector
 		linevector.push_back(temp);
+
+		// histo for the 'raw' data
 		histo->Fill(xpos,indexpos,temp);
 
-		// 'normalisation'
+		// difference to previous scan position, *1.0 for double
+		double diff_x = (temp-prevtemp)*1.0;
+
+		// histo for differential in x
+		histo_dx->Fill(xpos,indexpos,fabs(diff_x));
+
+		// save value for next position
+		prevtemp = temp;
+
+		// 'normalisation' -> FIXME
 		if ( temp > 100.0 )
 		{
 		    temp = 100.0;
@@ -151,14 +191,48 @@ void plot()
 		// add the scale position in x
 		xpos += scalescan;
 	    }
+	    // vector of this x position is added to the index vector
 	    totalvector.push_back(linevector);
-	}
-    }
+
+	} // done linecount
+
+    } // done reading file
 
     cout << "Read " << totalvector.size() << " lines!" << endl;
 
+    // same range as histo
+    double prev_i[1000] = {0.0};
+
+    // look at data
+    // iterator for index
+    vector< vector<double> >::iterator i;
+
+    // iterator for scan position
+    vector<double>::iterator j;
+
+    // loop both dimensions with iterators
+    for (i = totalvector.begin() ; i != (totalvector.end() -1); i++)
+    {
+	for (j = i->begin(); j != i->end(); j++)
+	{
+	    // j points to the position in the vector, get the correct element from the array for previous index
+	    double temp = 0.0;
+	    temp = *j - prev_i[j - i->begin()];
+
+	    // save current value into previous array
+	    prev_i[j - i->begin()] = *j;
+
+	    // fill histo
+	    histo_di->Fill((j - i->begin())*scalescan,indexlist[(i-totalvector.begin())+25],fabs(temp));
+
+	}
+    }
+
+    // let there be output
     outputFile->cd();
     histo->Write();
     histo_n->Write();
+    histo_dx->Write();
+    histo_di->Write();
 
 }
