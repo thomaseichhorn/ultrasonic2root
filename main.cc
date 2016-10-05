@@ -24,6 +24,7 @@
 
 using namespace std;
 
+// user can pass the file to be opened as an argument
 int main(int argc, char** argv)
 {
     std::string filename = "fail2";
