@@ -23,16 +23,25 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-    cout << "trying to open file";
-    ifstream filestream( "Datei0003.txt" );
+    string filename = "fail";
+    if (argc>1)
+    {
+	cout << "Trying to open file " << argv[1] << endl;
+	filename = argv[1];
+    } else {
+	cout << "Please enter a file to open:" << endl;
+	cin >> filename;
+    }
+
+    ifstream filestream( filename );
     if( !filestream )
     {
-	cout << ": failed!" << endl;
+	cout << "Opening file " << filename << " failed!" << endl;
 	return 0;
     }
-    cout << ": succeeded!" << endl;
+    cout << "Opening file " << filename << " succeeded!" << endl;
 
     // colors:
     // 55 - 'rainbow' palette (discouraged)
