@@ -2,6 +2,8 @@
 // Export data with OmniPC software
 // Thomas Eichhorn 2016
 
+// compile with g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic -Wextra
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -9,6 +11,9 @@
 #include <utility>
 #include <algorithm>
 
+#include "TROOT.h"
+#include "TFile.h"
+#include "TStyle.h"
 #include "TCanvas.h"
 #include "TGraph.h"
 #include "TAxis.h"
@@ -18,14 +23,14 @@
 
 using namespace std;
 
-void plot()
+int main()
 {
     cout << "trying to open file";
     ifstream filestream( "Datei0003.txt" );
     if( !filestream )
     {
 	cout << ": failed!" << endl;
-	return;
+	return 0;
     }
     cout << ": succeeded!" << endl;
 
@@ -61,7 +66,7 @@ void plot()
     histo_di->SetStats(0000);
 
     // the output file we want to save into
-    TFile * outputFile = new TFile("output.root", "RECREATE");
+    TFile* outputFile = new TFile("output.root", "RECREATE");
 
     // linecount in reading
     int linecount = 0;
