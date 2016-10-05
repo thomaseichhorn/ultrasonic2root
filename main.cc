@@ -3,6 +3,7 @@
 // Thomas Eichhorn 2016
 
 // compile with g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic -Wextra
+// run in ROOT with root -l main.cc+g
 
 #include <fstream>
 #include <sstream>
@@ -25,17 +26,20 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    string filename = "fail";
+    std::string filename = "fail2";
+    std::stringstream astream;
     if (argc>1)
     {
-	cout << "Trying to open file " << argv[1] << endl;
+	astream << argv[1];
+	filename = astream.str();
+	cout << "Trying to open file " << filename << endl;
 	filename = argv[1];
     } else {
 	cout << "Please enter a file to open:" << endl;
 	cin >> filename;
     }
 
-    ifstream filestream( filename );
+    ifstream filestream( filename.c_str() );
     if( !filestream )
     {
 	cout << "Opening file " << filename << " failed!" << endl;
@@ -137,13 +141,10 @@ int main(int argc, char** argv)
 	    fail = input.substr(0, pos);
 	    input.erase(0, pos + delimiter.length());
 
-	    // for string to double
-	    std::string::size_type sz;
-
 	    // header infos considered interesting...
 	    if (linecount == 9)
 	    {
-		scalescan = std::stod(input,&sz);
+		scalescan = atof(input.c_str());
 	    }
 
 	}
@@ -252,5 +253,12 @@ int main(int argc, char** argv)
     histo_n->Write();
     histo_dx->Write();
     histo_di->Write();
+
+    // free memory
+    delete outputFile;
+    delete histo;
+    delete histo_n;
+    delete histo_di;
+    delete histo_dx;
 
 }

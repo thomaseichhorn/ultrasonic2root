@@ -1,2 +1,4 @@
 *.root
 *.exe
+*.d
+*.so
