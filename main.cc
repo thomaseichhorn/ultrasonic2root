@@ -2,7 +2,7 @@
 // Export data with OmniPC software
 // Thomas Eichhorn 2016
 
-// compile with g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic -Wextra
+// compile with g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic
 // run in ROOT with root -l main.cc+g
 
 #include <fstream>
@@ -56,25 +56,25 @@ int main(int argc, char** argv)
 
     // the histogram
     //200mm scan direction, 60mm head / wedge width
-    TH2D *histo = new TH2D("Ultrasonic A-C-S Scan","Ultrasonic A-C-S Scan",1000,0,200,60,0,60);
+    TH2D *histo = new TH2D("Ultrasonic A-C-S Scan","Ultrasonic A-C-S Scan",999,0,200,60,0,60);
     histo->SetXTitle("Scan Position [mm]");
     histo->SetYTitle("Index Position [mm]");
     histo->SetStats(0000);
 
     // normalised means cut off at 100 :)
-    TH2D *histo_n = new TH2D("Ultrasonic A-C-S Scan Normalised","Ultrasonic A-C-S Scan Normalised",1000,0,200,60,0,60);
+    TH2D *histo_n = new TH2D("Ultrasonic A-C-S Scan Normalised","Ultrasonic A-C-S Scan Normalised",999,0,200,60,0,60);
     histo_n->SetXTitle("Scan Position [mm]");
     histo_n->SetYTitle("Index Position [mm]");
     histo_n->SetStats(0000);
 
     // differential in scan direction
-    TH2D *histo_dx = new TH2D("Ultrasonic A-C-S Scan Differential X","#partialA / #partialX",1000,0,200,60,0,60);
+    TH2D *histo_dx = new TH2D("Ultrasonic A-C-S Scan Differential X","#partialA / #partialX",999,0,200,60,0,60);
     histo_dx->SetXTitle("Scan Position [mm]");
     histo_dx->SetYTitle("Index Position [mm]");
     histo_dx->SetStats(0000);
 
     // differential in index direction
-    TH2D *histo_di = new TH2D("Ultrasonic A-C-S Scan Differential I","#partialA / #partialI",1000,0,200,60,0,60);
+    TH2D *histo_di = new TH2D("Ultrasonic A-C-S Scan Differential I","#partialA / #partialI",999,0,200,60,0,60);
     histo_di->SetXTitle("Scan Position [mm]");
     histo_di->SetYTitle("Index Position [mm]");
     histo_di->SetStats(0000);
