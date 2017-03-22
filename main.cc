@@ -33,11 +33,12 @@ int main(int argc, char** argv)
     {
 	astream << argv[1];
 	filename = astream.str();
-	cout << "Trying to open file " << filename << endl;
+	cout << "Opening file " << filename << "...";
 	filename = argv[1];
     } else {
 	cout << "Please enter a file to open:" << endl;
 	cin >> filename;
+        cout << "Opening file " << filename << "...";
     }
 
     // strip the file extension for output file name
@@ -47,10 +48,10 @@ int main(int argc, char** argv)
     ifstream filestream( filename.c_str() );
     if( !filestream )
     {
-	cout << "Opening file " << filename << " failed!" << endl;
+	cout << " failed!" << endl;
 	return 0;
     }
-    cout << "Opening file " << filename << " succeeded!" << endl;
+    cout << " succeeded!" << endl;
 
     // colors:
     // 55 - 'rainbow' palette (discouraged)
@@ -104,6 +105,9 @@ int main(int argc, char** argv)
 
     // position in mm of each index
     double indexlist[100] = {0.0};
+    
+    // normalisation
+    double normal = 0.0;
 
     // read file
     while( filestream.good() && ! filestream.eof() )
@@ -220,13 +224,6 @@ int main(int argc, char** argv)
 		// save value for next position
 		prevtemp = temp;
 
-		// 'normalisation' -> FIXME
-		if ( temp > 100.0 )
-		{
-		    temp = 100.0;
-		}
-		histo_n->Fill(xpos,indexpos,temp);
-
 		// add the scale position in x
 		xpos += scalescan;
 	    }
@@ -237,10 +234,31 @@ int main(int argc, char** argv)
 
     } // done reading file
 
+    filestream.close();
     cout << "Read " << totalvector.size() << " lines!" << endl;
 
+    // Normalised histo
+    normal = 100.0/(histo->GetMaximum());
+
+    for (int i=0;i<histo->GetNbinsX();i++)
+    {
+        for (int j=0;j<histo->GetNbinsY();j++)
+        {
+            double temp = 0.0;
+            double temp2 = 0.0;
+            temp = histo->GetBinContent(i,j);
+            temp2 = temp * normal;
+            histo_n->SetBinContent(i,j,temp2);
+        }
+    }
+
     // same range as histo
-    double prev_i[1000] = {0.0};
+    double* prev_i = new double[nscan];
+    
+    for (int i = 0; i<nscan;i++)
+    {
+        prev_i[i] = 0.0;
+    }
 
     // look at data
     // iterator for index
@@ -266,6 +284,8 @@ int main(int argc, char** argv)
 
 	}
     }
+    
+    cout << "Writing output...";
 
     // let there be output
     outputFile->cd();
@@ -275,10 +295,13 @@ int main(int argc, char** argv)
     histo_di->Write();
 
     // free memory
+    outputFile->Close();
+    delete [] prev_i;
     delete outputFile;
     delete histo;
     delete histo_n;
     delete histo_di;
     delete histo_dx;
-
+    
+    cout << " done!" << endl;
 }
