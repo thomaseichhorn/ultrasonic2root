@@ -3,24 +3,8 @@
 Simple ROOT script to convert ultrasonic A-C-S data into a ROOT file.
 Further analysis can then be performed.
 
-To run, source your ROOT environment with
 
-    $ source /your/root/path/bin/thisroot.sh
-
-and then run
-
-    $ root -l main.cc+g
-
-or compile with
-
-    $ g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic -Wextra
-
-and then run ./ultrasonic.exe
-
-The input file to be used can be passed as an argument.
-
-
-Installing the Olympus NDT Software in a Virtual Machine:
+## Installing the Olympus NDT Software in a Virtual Machine
 
 - install Virtualbox
 - create a virtual machine running Microsoft Windows
@@ -34,3 +18,28 @@ Installing the Olympus NDT Software in a Virtual Machine:
 - run OmniPC, right click on the A-C-S image to export
 - the exported .txt file is saved in C:\Users\Public\Documents\Olympus NDT\OmniPC\Export
 - copy/move the files to your ultrasonic2root directory
+
+
+## Running the Script
+
+To run, source your ROOT environment with
+
+    $ source /your/root/path/bin/thisroot.sh
+
+and then run
+
+    $ root -l main.cc+g
+
+or compile with
+
+    $ g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -std=c++0x -pedantic -Wextra
+
+and then run
+
+    $ ./ultrasonic.exe
+
+The input file to be used can be passed as an argument:
+
+    $ ./ultrasonic.exe myfile.txt
+
+The filename will be used for output, in this case *myfile.root*
