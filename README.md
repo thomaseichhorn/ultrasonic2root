@@ -9,7 +9,9 @@ Further analysis can then be performed.
 - install Virtualbox
 - create a virtual machine running Microsoft Windows
 - add your user to the vboxuser group:
+
     $ sudo adduser $USER vboxusers
+
 - log out and log in again to refresh
 - in Windows: install OmniPC and the KeyTool from the USB Stick provided with the device
 - connect the USB Key Dongle to your computer, but do not mount it
