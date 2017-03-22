@@ -1,6 +1,6 @@
 // Small script to plot the data files from an a-c-s-scan
 // Export data with OmniPC software
-// Thomas Eichhorn 2016
+// Thomas Eichhorn 2016, 2017
 
 // compile with g++ -I `root-config --incdir` -o ultrasonic.exe main.cc `root-config --libs` -Wall -std=c++0x -pedantic
 // run in ROOT with root -l main.cc+g
@@ -39,6 +39,10 @@ int main(int argc, char** argv)
 	cout << "Please enter a file to open:" << endl;
 	cin >> filename;
     }
+
+    // strip the file extension for output file name
+    size_t lastindex = filename.find_last_of("."); 
+    string rawname = filename.substr(0, lastindex);
 
     ifstream filestream( filename.c_str() );
     if( !filestream )
@@ -80,7 +84,8 @@ int main(int argc, char** argv)
     histo_di->SetStats(0000);
 
     // the output file we want to save into
-    TFile* outputFile = new TFile("output.root", "RECREATE");
+    string outputstring = rawname + ".root";
+    TFile* outputFile = new TFile(outputstring.c_str(), "RECREATE");
 
     // linecount in reading
     int linecount = 0;
@@ -90,6 +95,9 @@ int main(int argc, char** argv)
 
     // distance of each scan index array in x in mm
     double scalescan = 1.0;
+
+    // total number of scan points
+    int nscan = 100;
 
     // first scan position in x in mm
     double startx = 0.0;
@@ -143,11 +151,22 @@ int main(int argc, char** argv)
 	    input.erase(0, pos + delimiter.length());
 
 	    // header infos considered interesting...
+	    // number of scan positions
+	    if (linecount == 8)
+	    {
+		nscan = atoi(input.c_str());
+	    }
+	    // space of each scan
 	    if (linecount == 9)
 	    {
 		scalescan = atof(input.c_str());
-	    }
 
+		// we can now adjust the binning
+		histo->SetBins(nscan,0,nscan*scalescan,60,0,60);
+		histo_n->SetBins(nscan,0,nscan*scalescan,60,0,60);
+		histo_dx->SetBins(nscan,0,nscan*scalescan,60,0,60);
+		histo_di->SetBins(nscan,0,nscan*scalescan,60,0,60);
+	    }
 	}
 
 	// line 23 holds the scan position in x
